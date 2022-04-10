@@ -3,11 +3,15 @@ var apiKey = "b19a326e95573b97fb07965960f44846";
 function getWeather(city) {
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},us&appid=${apiKey}`) //this fetch allows city name, so we can lat/lon for onecall fetch
         .then(function (response) {
+            if (!response.ok) {
+                throw new Error('response not ok');
+            }
             return response.json();
         })
         .then(function (data) {
             // update city name in html
             $(cityName).text(data.name);
+            $("#msg").text("");
             // save entry
             saveEntry(data.name);
             fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${data.coord.lat}&lon=${data.coord.lon}&units=imperial&exclude=current,minutely,hourly,alerts&appid=${apiKey}`)
@@ -61,6 +65,9 @@ function getWeather(city) {
                     //show everything
                     $("#displayBox").show();
                 });
+        })
+        .catch(function(error) {
+            $("#msg").text("No Search Results");
         });
 }
 
