@@ -57,6 +57,9 @@ function getWeather(city) {
                     } else {
                         uvEl.css("background-color","red");
                     }
+
+                    //show everything
+                    $("#displayBox").show();
                 });
         });
 }
@@ -103,8 +106,7 @@ $("#search").on('click', function (event) {
     $("#cityName").val("");
 });
 
-$("#savedCityList").on('click', '.btn-secondary', function (event) {
-    event.preventDefault();
+$("#savedCityList").on('click', '.btn-secondary', function () {
     getWeather($(this).text());
 });
 
