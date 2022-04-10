@@ -1,8 +1,6 @@
 var apiKey = "b19a326e95573b97fb07965960f44846";
 
-function getWeather(event) {
-    event.preventDefault();
-    var city = $("#cityName").val();
+function getWeather(city) {
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},us&appid=${apiKey}`) //this fetch allows city name, so we can lat/lon for onecall fetch
         .then(function (response) {
             return response.json();
@@ -10,6 +8,8 @@ function getWeather(event) {
         .then(function (data) {
             // update city name in html
             $(cityName).text(data.name);
+            // save entry
+            saveEntry(data.name);
             fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${data.coord.lat}&lon=${data.coord.lon}&units=imperial&exclude=current,minutely,hourly,alerts&appid=${apiKey}`)
                 //fetch more detailed weather info now that we have the lat/lon
                 .then(function (response) {
@@ -61,6 +61,51 @@ function getWeather(event) {
         });
 }
 
+//helper function to save cities searched
+function saveEntry(city) {
+    var cityArray = JSON.parse(localStorage.getItem("cities"));
+    if (!cityArray) {
+        cityArray = [city];
+    } else {
+        // loop through array, if alrdy exists, delete it
+        for (let i=0; i<cityArray.length; i++) {
+            if (cityArray[i] === city) {
+                cityArray.splice(i,1);
+                // end loop, no need to continue as there cant be multiple duplicates as we delete every time
+                i = cityArray.length;
+            }
+        }
+        // now the newest entry will be the city just searched
+        cityArray.push(city);
+    }
+    // update local storage and show saved
+    localStorage.setItem("cities", JSON.stringify(cityArray));
+    showSaved();
+}
+
+//helper function to show saved cities in localStorage
+function showSaved() {
+    var cityArray = JSON.parse(localStorage.getItem("cities"));
+    if (cityArray) {
+        var cityList = $("#savedCityList");
+        cityList.empty();
+        // show last search first
+        for (let i=cityArray.length-1; i>=0; i--) {
+            var savedCity = $(`<button class="btn btn-secondary mb-2 w-100" type="button">${cityArray[i]}</button>`);
+            cityList.append(savedCity);
+        }
+    }
+}
+
 $("#search").on('click', function (event) {
-    getWeather(event);
+    event.preventDefault();
+    getWeather($("#cityName").val());
+    $("#cityName").val("");
 });
+
+$("#savedCityList").on('click', '.btn-secondary', function (event) {
+    event.preventDefault();
+    getWeather($(this).text());
+});
+
+showSaved();
