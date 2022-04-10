@@ -1,7 +1,7 @@
 var apiKey = "b19a326e95573b97fb07965960f44846";
 
 function getWeather(city) {
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},us&appid=${apiKey}`) //this fetch allows city name, so we can lat/lon for onecall fetch
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`) //this fetch allows city name, so we can lat/lon for onecall fetch
         .then(function (response) {
             if (!response.ok) {
                 throw new Error('response not ok');
